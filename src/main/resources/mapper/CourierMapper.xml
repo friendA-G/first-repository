@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.dao.CourierMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.bean.Courier">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="courierName" jdbcType="VARCHAR" property="couriername" />
+    <result column="passWord" jdbcType="VARCHAR" property="password" />
+    <result column="courierPhone" jdbcType="VARCHAR" property="courierphone" />
+    <result column="idNumber" jdbcType="VARCHAR" property="idnumber" />
+    <result column="expressNumber" jdbcType="VARCHAR" property="expressnumber" />
+    <result column="logonTime" jdbcType="TIMESTAMP" property="logontime" />
+    <result column="loginTime" jdbcType="TIMESTAMP" property="logintime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, courierName, passWord, courierPhone, idNumber, expressNumber, logonTime, loginTime
+  </sql>
+
+  <select id="findConsole" resultType="map">
+    SELECT COUNT(id) AS size , COUNT(TO_DAYS(LOGONTIME) = TO_DAYS(NOW()) OR NULL) AS logonSize FROM COURIER
+  </select>
+
+  <select id="findByCourierPhone" parameterType="string" resultMap="BaseResultMap">
+    SELECT * FROM COURIER WHERE COURIERPHONE=#{courierPhone}
+  </select>
+
+  <update id="updateExpressNumber" parameterType="com.kaikeba.bean.Courier">
+    UPDATE COURIER SET EXPRESSNUMBER=#{expressNumber} WHERE COURIERPHONE=#{sysPhone}
+  </update>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    SELECT * FROM COURIER
+  </select>
+
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from courier
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from courier
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kaikeba.bean.Courier">
+    insert into courier (id, courierName, passWord, 
+      courierPhone, idNumber, expressNumber, 
+      logonTime, loginTime)
+    values (#{id,jdbcType=INTEGER}, #{couriername,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{courierphone,jdbcType=VARCHAR}, #{idnumber,jdbcType=VARCHAR}, #{expressnumber,jdbcType=VARCHAR}, 
+      #{logontime,jdbcType=TIMESTAMP}, #{logintime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kaikeba.bean.Courier">
+    insert into courier
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="couriername != null">
+        courierName,
+      </if>
+      <if test="password != null">
+        passWord,
+      </if>
+      <if test="courierphone != null">
+        courierPhone,
+      </if>
+      <if test="idnumber != null">
+        idNumber,
+      </if>
+      <if test="expressnumber != null">
+        expressNumber,
+      </if>
+      <if test="logontime != null">
+        logonTime,
+      </if>
+      <if test="logintime != null">
+        loginTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="couriername != null">
+        #{couriername,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="courierphone != null">
+        #{courierphone,jdbcType=VARCHAR},
+      </if>
+      <if test="idnumber != null">
+        #{idnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="expressnumber != null">
+        #{expressnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="logontime != null">
+        #{logontime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logintime != null">
+        #{logintime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.bean.Courier">
+    update courier
+    <set>
+      <if test="couriername != null">
+        courierName = #{couriername,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        passWord = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="courierphone != null">
+        courierPhone = #{courierphone,jdbcType=VARCHAR},
+      </if>
+      <if test="idnumber != null">
+        idNumber = #{idnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="expressnumber != null">
+        expressNumber = #{expressnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="logontime != null">
+        logonTime = #{logontime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logintime != null">
+        loginTime = #{logintime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.bean.Courier">
+    update courier
+    set courierName = #{couriername,jdbcType=VARCHAR},
+      passWord = #{password,jdbcType=VARCHAR},
+      courierPhone = #{courierphone,jdbcType=VARCHAR},
+      idNumber = #{idnumber,jdbcType=VARCHAR},
+      expressNumber = #{expressnumber,jdbcType=VARCHAR},
+      logonTime = #{logontime,jdbcType=TIMESTAMP},
+      loginTime = #{logintime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

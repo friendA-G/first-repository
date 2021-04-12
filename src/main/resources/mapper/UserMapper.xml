@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.dao.UserMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.bean.User">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="userName" jdbcType="VARCHAR" property="username" />
+    <result column="userPhone" jdbcType="VARCHAR" property="userphone" />
+    <result column="passWord" jdbcType="VARCHAR" property="password" />
+    <result column="idNumber" jdbcType="VARCHAR" property="idnumber" />
+    <result column="loginTime" jdbcType="TIMESTAMP" property="logintime" />
+    <result column="logonTime" jdbcType="TIMESTAMP" property="logontime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, userName, userPhone, passWord, idNumber, loginTime, logonTime
+  </sql>
+
+  <select id="findConsole" resultType="map">
+    SELECT COUNT(id) AS size , COUNT(TO_DAYS(LOGONTIME) = TO_DAYS(NOW()) OR NULL) AS logonSize FROM USER
+  </select>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    SELECT * FROM USER
+  </select>
+
+  <select id="findByPhone" resultMap="BaseResultMap">
+    SELECT * FROM USER WHERE USERPHONE=#{userPhone}
+  </select>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from user
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kaikeba.bean.User">
+    insert into user (id, userName, userPhone, 
+      passWord, idNumber, loginTime, 
+      logonTime)
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{userphone,jdbcType=VARCHAR}, 
+      #{password,jdbcType=VARCHAR}, #{idnumber,jdbcType=VARCHAR}, #{logintime,jdbcType=TIMESTAMP}, 
+      #{logontime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kaikeba.bean.User">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="username != null">
+        userName,
+      </if>
+      <if test="userphone != null">
+        userPhone,
+      </if>
+      <if test="password != null">
+        passWord,
+      </if>
+      <if test="idnumber != null">
+        idNumber,
+      </if>
+      <if test="logintime != null">
+        loginTime,
+      </if>
+      <if test="logontime != null">
+        logonTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userphone != null">
+        #{userphone,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="idnumber != null">
+        #{idnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="logintime != null">
+        #{logintime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logontime != null">
+        #{logontime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.bean.User">
+    update user
+    <set>
+      <if test="username != null">
+        userName = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userphone != null">
+        userPhone = #{userphone,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        passWord = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="idnumber != null">
+        idNumber = #{idnumber,jdbcType=VARCHAR},
+      </if>
+      <if test="logintime != null">
+        loginTime = #{logintime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="logontime != null">
+        logonTime = #{logontime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.bean.User">
+    update user
+    set userName = #{username,jdbcType=VARCHAR},
+      userPhone = #{userphone,jdbcType=VARCHAR},
+      passWord = #{password,jdbcType=VARCHAR},
+      idNumber = #{idnumber,jdbcType=VARCHAR},
+      loginTime = #{logintime,jdbcType=TIMESTAMP},
+      logonTime = #{logontime,jdbcType=TIMESTAMP}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

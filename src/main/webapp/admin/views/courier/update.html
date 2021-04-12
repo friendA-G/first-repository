@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/add.css"/>
+	</head>
+	<body>
+		<div id="app">
+			<div class="header">
+				<span>修改快递员</span>
+			</div>
+			<div class="content">
+				<table>	
+					<tr>
+						<td class="text-right">手机号码</td><td class="content_right"><input class="input inline-input" placeholder="请输入手机号码" id="number"> <span class="btn btn-info" id="find">立即查找</span></td>
+					</tr>
+				</table>
+			</div>
+			
+			
+			<div class="header">
+				<span>查找信息如下</span>
+			</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td class="text-right">姓名</td><td class="content_right"><input class="input" placeholder="请输入姓名"></td>
+					</tr>
+					<tr>
+						<td class="text-right">手机号码</td><td class="content_right"><input class="input" placeholder="请输入手机号码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">身份证号码</td><td class="content_right"><input class="input" placeholder="请输入身份证号码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">密码</td><td class="content_right"><input class="input" placeholder="请输入密码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">派件数</td><td class="content_right"><input class="input" placeholder="请输入派件数"></td>
+					</tr>
+					<tr>
+						<td></td><td class="content_right"><span class="btn btn-info" id="update">立即修改</span> <span class="btn" id="reset">重置</span> </td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+
+	<script src="/js/jquery-3.5.0.min.js"></script>
+	<script src="/layer/layer.js"></script>
+	<script>
+		$(function () {
+			var courierID = null;
+			$(".header:eq(1),.content:eq(1)").hide();
+			$("#find").click(function () {
+				var courierPhone = $("input:eq(0)").val();
+				var id = layer.load();
+				$.getJSON("/courier/find.do", {courierPhone: courierPhone}, function (result) {
+					layer.close(id);
+					layer.msg(result.result);
+					if (result.status === 0) {
+						$(".header:eq(1),.content:eq(1)").fadeIn(1500);
+						$("input:eq(1)").val(result.data.couriername);
+						$("input:eq(2)").val(result.data.courierphone);
+						$("input:eq(3)").val(result.data.idnumber);
+						$("input:eq(4)").val(result.data.password);
+						$("input:eq(5)").val(result.data.expressnumber);
+						courierID = result.data.id;
+					}
+				});
+			});
+			$("#update").click(function () {
+				var courierName = $("input:eq(1)").val();
+				var courierPhone = $("input:eq(2)").val();
+				var idNumber = $("input:eq(3)").val();
+				var passWord = $("input:eq(4)").val();
+				var expressNumber = $("input:eq(5)").val();
+				if ((courierName === "") || (courierPhone === "") || (idNumber === "") || (passWord === "") || (expressNumber === "")) {
+					layer.alert("请输入完整的信息", {icon: 5});
+					return false;
+				} else {
+					if (courierPhone.length !== 11) {
+						layer.alert("请输入11位数的电话号码", {icon: 5});
+						return false;
+					} else if (courierPhone.match(/^\d{11}$/) == null) {
+						layer.alert("请勿输入数字以外的字符作为电话号码", {icon: 5});
+						return false;
+					} else if (courierPhone.match(/^[0]/) !== null) {
+						layer.alert("请勿输入以0开头的电话号码", {icon: 5});
+						return false;
+					} else if (idNumber.length !== 18) {
+						layer.alert("请输入18位数的身份证号", {icon: 5});
+						return false;
+					} else if (idNumber.match(/^[0]/) !== null) {
+						layer.alert("请勿输入以0开头的身份证号", {icon: 5});
+						return false;
+					}else if(idNumber.match(/[0-9]{18}/)==null||(idNumber.match(/[0-9]{17}/)==null&&idNumber.match(/[A-Z]$/)==null)){
+						layer.alert("请输入18位数字或17位数字和1位大写英文字符结尾的身份证号",{icon:5});
+						return false;
+					} else if (courierName.length < 2 || courierName.length > 16) {
+						layer.alert("请输入2-16位的用户名", {icon: 5});
+						return false;
+					} else if (courierName.match(/\s+/) !== null) {
+						layer.alert("请勿输入空白字符作为姓名", {icon: 5});
+						return false;
+					} else if (passWord.length < 5 || passWord.length > 12) {
+						layer.alert("请输入5-12位的密码", {icon: 5});
+						return false;
+					} else if (passWord.match(/^\w{5,12}$/) == null) {
+						layer.alert("请勿输入数字、英文字母、下滑线以外的字符作为密码", {icon: 5});
+						return false;
+					} else if (expressNumber.length > 15 || expressNumber.length < 1) {
+						layer.alert("请输入1-15位数", {icon: 5});
+						return false;
+					} else if (expressNumber.match(/^\d{1,15}$/) == null) {
+						layer.alert("请勿输入数字以外的字符", {icon: 5});
+						return false;
+					} else if (expressNumber.match(/^[0]{2}/) != null) {
+						layer.alert("请勿输入以数字0开头的2位数以上的数字", {icon: 5});
+						return false;
+					} else {
+						var id = layer.load();
+						var info = {
+							id : courierID,
+							courierPhone: courierPhone,
+							courierName: courierName,
+							idNumber: idNumber,
+							passWord: passWord,
+							expressNumber: expressNumber
+						};
+						$.getJSON("/courier/update.do",info,function (result) {
+							layer.close(id);
+							layer.msg(result.result);
+							if(result.status===0){
+								$(".header:eq(1),.content:eq(1)").hide();
+							}
+						});
+					}
+				}
+			});
+
+			$("#reset").click(function () {
+				$("input:eq(1),input:eq(2),input:eq(3),input:eq(4),input:eq(5)").val("");
+			});
+		});
+	</script>
+</html>

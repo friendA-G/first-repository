@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.dao.AdminMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.bean.Admin">
+    <id column="adminID" jdbcType="INTEGER" property="adminid" />
+    <result column="adminName" jdbcType="VARCHAR" property="adminname" />
+    <result column="passWord" jdbcType="VARCHAR" property="password" />
+    <result column="loginIp" jdbcType="VARCHAR" property="loginip" />
+    <result column="loginTime" jdbcType="VARCHAR" property="logintime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    adminID, adminName, passWord, loginIp, loginTime
+  </sql>
+
+  <select id="findInfo" resultType="integer">
+    SELECT ADMINID FROM ADMIN WHERE ADMINNAME=#{adminname} AND PASSWORD=#{password}
+  </select>
+  <update id="updateLoginInfo" parameterType="com.kaikeba.bean.Admin">
+    UPDATE  ADMIN SET LOGINIP=#{loginip},LOGINTIME=#{logintime} WHERE ADMINID=#{adminid}
+  </update>
+
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from admin
+    where adminID = #{adminid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from admin
+    where adminID = #{adminid,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.kaikeba.bean.Admin">
+    insert into admin (adminID, adminName, passWord, 
+      loginIp, loginTime)
+    values (#{adminid,jdbcType=INTEGER}, #{adminname,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{loginip,jdbcType=VARCHAR}, #{logintime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.kaikeba.bean.Admin">
+    insert into admin
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="adminid != null">
+        adminID,
+      </if>
+      <if test="adminname != null">
+        adminName,
+      </if>
+      <if test="password != null">
+        passWord,
+      </if>
+      <if test="loginip != null">
+        loginIp,
+      </if>
+      <if test="logintime != null">
+        loginTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="adminid != null">
+        #{adminid,jdbcType=INTEGER},
+      </if>
+      <if test="adminname != null">
+        #{adminname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="loginip != null">
+        #{loginip,jdbcType=VARCHAR},
+      </if>
+      <if test="logintime != null">
+        #{logintime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.bean.Admin">
+    update admin
+    <set>
+      <if test="adminname != null">
+        adminName = #{adminname,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        passWord = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="loginip != null">
+        loginIp = #{loginip,jdbcType=VARCHAR},
+      </if>
+      <if test="logintime != null">
+        loginTime = #{logintime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where adminID = #{adminid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.bean.Admin">
+    update admin
+    set adminName = #{adminname,jdbcType=VARCHAR},
+      passWord = #{password,jdbcType=VARCHAR},
+      loginIp = #{loginip,jdbcType=VARCHAR},
+      loginTime = #{logintime,jdbcType=VARCHAR}
+    where adminID = #{adminid,jdbcType=INTEGER}
+  </update>
+</mapper>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/list.css"/>
+		<link href="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.css" rel="stylesheet">
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+		<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.17.1/bootstrap-table.min.js"></script>
+		<script src="https://cdn.bootcdn.net/ajax/libs/bootstrap-table/1.17.1/locale/bootstrap-table-zh-CN.min.js"></script>
+	</head>
+	<body>
+
+	<table id="list">
+
+	</table>
+	<script>
+		$(function () {
+			$("#list").bootstrapTable({
+				url:"/courier/list.do",
+				stripes:true, //是否显示行间距
+				pageNumber:1, //初始加载第几页
+				pagination:true, //是否分页
+				sidePagination:'server', //在服务器端分页
+				pageSize:5, //每页的数量
+				pageList:[5,10,15], //可选择每页数量的集合
+				showRefresh:true, //显示刷新按钮
+				queryParams:function (params) {
+					var temp = {
+						pNum:params.offset,
+						pSize: params.limit
+					}
+					return temp;
+				},
+				columns:[
+					{
+						title:"编号",
+						field:"id",
+						sortable:false
+					},
+					{
+						title:"姓名",
+						field:"courierName",
+						sortable:false
+					},
+					{
+						title:"手机号码",
+						field:"courierPhone",
+						sortable:false
+					},
+					{
+						title:"身份证",
+						field:"idNumber",
+						sortable:false
+					},
+					{
+						title:"密码",
+						field:"passWord",
+						sortable:false
+					},
+					{
+						title:"派件数",
+						field:"expressNumber",
+						sortable:false
+					},
+					{
+						title:"注册时间",
+						field:"logonTime",
+						sortable:false
+					},{
+
+						title:"上次登录的时间",
+						field:"loginTime",
+						sortable:false
+					}
+				]
+
+			});
+		});
+
+	</script>
+
+	</body>
+</html>

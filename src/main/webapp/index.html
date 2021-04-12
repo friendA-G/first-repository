@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title>快件e栈服务平台</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<link href="css/normalize.css" type="text/css" rel="stylesheet" />
+	<link href="css/main.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="js/notice.js"  type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	<style>
+		#PageContext{
+			color: black;
+		}
+		.expInfoCont{
+			width:100%;
+			box-sizing: border-box;
+			background-color:#fff;
+			border-radius: 10px;
+			padding: 30px;
+		}
+		.status1{
+			display: block;
+		}
+		.btn-success{
+			padding: 5px 15px;
+			color: #fff;
+			background: #2F9925;
+			border: 1px solid #fff;
+			border-radius: 5px;
+		}
+		.expInfoCont>.btns{
+			border-top: 1px dashed #666;
+			padding-top: 20px;
+			text-align: right;
+			margin-top: 10px;
+		}
+	</style>
+</head>
+<body>
+	<div class="content">
+		<div class="top autoH">
+			<div class="logo autoH">
+				<img src="images/logo.png" width="100%">
+			</div>
+		</div>
+		<div class="middle">
+			<form id="theForm">
+				<div class="forminput">
+					<input type="text" id="expressNum" name="expressNum" placeholder="请输入快递单号...">
+					<input id="PageContext" type="hidden" value=""/>
+					<div class="submBtn"></div>
+				</div>
+			</form>
+		</div>
+		<div class="express">
+
+		</div>
+		<div class="funContdiv">
+			<div class="funCont">
+				<div class="userFun">
+					<p class="funIcon userFunColor1"></p>
+					<p class="funTxt">个人中心</p>
+				</div>
+				<div class="userFun">
+					<p class="funIcon userFunColor2"></p>
+					<p class="funTxt">懒人排行</p>
+				</div>
+				<div class="userFun">
+					<p class="funIcon userFunColor3"></p>
+					<p class="funTxt">取货二维码</p>
+				</div>
+				<div class="userFun">
+					<p class="funIcon userFunColor4"></p>
+					<p class="funTxt">我的快件</p>
+				</div>
+					<div class="userFun" id="status">
+						<p class="funIcon userFunColor5"></p>
+						<p class="funTxt">快递助手</p>
+					</div>
+					<div class="userFun">
+						<p class="funIcon userFunColor6"></p>
+						<p class="funTxt">退出登录</p>
+					</div>
+			</div>
+		</div>
+	
+		<div class="footer">
+			<p class="copytxt">&copy;新职课版权所有</p>
+		</div>
+	</div>
+	<script src="layer/layer.js"></script>
+	<script type="text/javascript">
+	$(function(){
+
+		$.getJSON("/wx/getStatus.do",null,function (result) {
+			if(result.status===0){
+				$("#status").hide();
+			}
+		});
+
+		var pageContextVal = $("#PageContext").val();
+		$(".userFun").click(function(){
+			var clickNum = $(this).index();
+			switch(clickNum){
+				//个人中心
+				case(0): 
+					window.location.href= "wxUserhome.html"; 
+					break;
+				case(1): 
+					window.location.href= "lazyboard.html"; 
+					break;
+				case(2): window.location.href= "/wx/setQrCode.do"; break;
+				case(3): window.location.href= "expressList.html"; break;
+				case(4): window.location.href= "expressAssist.html"; break;
+				case(5): window.location.href= "/wx/exit.do"; break;
+			}
+		});
+		var initFunc = function(){
+			var windowH = $(document).height();
+			var windowW = $(document).width();
+
+			$(".content").css({"height": windowH+"px"});
+
+			var contentW = $(".content").width();
+			var contentH = $(".content").height();
+
+			var contH = windowH / 3;
+			$(".autoH").css({"height": contH+"px"});
+
+			// userFunH  content
+			var middleH = $(".middle").height() + 40;
+			var userFunH = contentH - contH - middleH - 30 -20; //footer,userfun(margin)
+			$(".funContdiv").css({"height":userFunH+"px"});
+
+			var funIconH = $(".funIcon").width(); 
+			$(".funIcon").css({"height": funIconH+"px","line-height": funIconH+"px","border-radius": funIconH/2 +"px","font-size":funIconH/2 +"px"});
+
+		};
+
+		initFunc();
+
+		$(window).resize(function(){
+			initFunc();
+		});
+
+		// input focus
+		$(".middle .forminput input").focus(function(){
+			$(".middle .forminput").css({"border":"1px solid rgba(31,114,255,.75)","box-shadow":"0 0 8px rgba(31,114,255,.5)"});
+		});
+
+		// input blur
+		$(".middle .forminput input").blur(function(){
+			$(".middle .forminput").css({"border":"1px solid #333333","box-shadow":"none"});
+		});
+
+		//submit arrow
+		$(".submBtn").click(function(){
+			var expressNum = $("#expressNum").val();//快递单号
+			var id = layer.load();
+			 $.ajax({
+				type:'GET',
+				url:'/wx/findExpressByNumber.do',
+				data:{'number':expressNum},
+				dataType: "json",
+				success:function(result){
+					layer.close(id);
+					layer.msg(result.result);
+					if(result.status===0){
+						$(".funContdiv").hide();
+						var data1 = result.data[0];
+						var temp =null;
+						if(data1.code.match(/^\d/)==null){
+							temp = "<div class=\"expInfoCont status1\">\n" +
+									"\t\t\t<table>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>快递公司：</td><td>"+data1.company+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>快递单号：</td><td>"+data1.number+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>取件时间：</td><td>"+data1.outTime+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>取件码：</td><td>"+data1.code+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t</table>\n" +
+									"\t\t\t<div class=\"btns\">\n" +
+									"\t\t\t\t<input type=\"button\" class=\"btn-success\" onclick=\"onTrue()\" value=\"确认\"/ >\n" +
+									"\t\t\t</div>\n" +
+									"\t\t</div>";
+							$(".express").append($(temp)).show();
+						}else {
+							temp = "<div class=\"expInfoCont status1\">\n" +
+									"\t\t\t<table>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>快递公司：</td><td>"+data1.company+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>快递单号：</td><td>"+data1.number+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>到件时间：</td><td>"+data1.inTime+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t\t<tr>\n" +
+									"\t\t\t\t\t<td>取件码：</td><td>"+data1.code+"</td>\n" +
+									"\t\t\t\t</tr>\n" +
+									"\t\t\t</table>\n" +
+									"\t\t\t<div class=\"btns\">\n" +
+									"\t\t\t\t<input type=\"button\" class=\"btn-success\" onclick=\"onTrue()\" value=\"确认\"/ >\n" +
+									"\t\t\t</div>\n" +
+									"\t\t</div>";
+							$(".express").append($(temp)).show();
+						}
+					}
+				},
+				error:function(){
+				}
+			 });
+		});
+	});
+	function onTrue() {
+		$(".express").html("").hide();
+		$(".funContdiv").show();
+	}
+	</script>
+</body>
+</html>

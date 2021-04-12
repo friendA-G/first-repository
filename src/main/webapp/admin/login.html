@@ -1,0 +1,76 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="assets/css/layui.css">
+    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="icon" href="/favicon.ico">
+    <title>快递e栈管理后台</title>
+</head>
+<body class="login-wrap">
+    <div class="login-container">
+    	<h3>快递e栈后台管理</h3>
+        <form class="login-form" action="<!--index.html-->">
+            <div class="input-group">
+                <input type="text" id="username" class="input-field">
+                <label for="username" class="input-label">
+                    <span class="label-title">用户名</span>
+                </label>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" class="input-field">
+                <label for="password" class="input-label">
+                    <span class="label-title">密码</span>
+                </label>
+            </div>
+            <button type="button" class="login-button">登录<i class="ai ai-enter"></i></button>
+        </form>
+    </div>
+</body>
+
+<script src="assets/layui.js"></script>
+<script src="js/index.js" data-main="login"></script>
+<script src="js/login.js" data-main="login"></script>
+
+
+<script src="../js/jquery-3.5.0.min.js"></script>
+<script src="../layer/layer.js"></script>
+<script type="text/javascript">
+    $(function(){
+        $(".login-button").click(function(){
+            var userName = $("#username").val();
+            var passWord = $("#password").val();
+            if((userName=="")||(passWord=="")){
+                layer.alert("请输入用户名和密码",{icon:5});
+                return false;
+            }else {
+                if(userName.length<5||userName.length>12){
+                    layer.alert("请输入5-12位的用户名",{icon:5});
+                    return false;
+                }else if(userName.match(/^\w{5,12}$/)==null){
+                        layer.alert("请勿输入字母、数字或下划线以外的字符",{icon:5});
+                        return false;
+                }else if(passWord.length<6||passWord.length>12){
+                        layer.alert("请输入6-12位的密码",{icon:5});
+                        return false;
+                }else if(passWord.match(/^\S{6,12}$/)==null){
+                        layer.alert("请勿输入空白子符",{icon:5});
+                        return false;
+                }else {
+
+                    var id = layer.load();
+                    $.post("login.do",{username:userName,password:passWord},function(result){
+                        layer.close(id);
+                        layer.msg(result.result);
+                        if(result.status == 0){
+                            location.href='index.do';
+                        }
+                    },"JSON");
+                }
+            }
+        });
+    });
+</script>
+</html>

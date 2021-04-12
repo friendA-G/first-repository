@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kaikeba.dao.ExpressMapper">
+  <resultMap id="BaseResultMap" type="com.kaikeba.bean.Express">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="number" jdbcType="VARCHAR" property="number" />
+    <result column="userName" jdbcType="VARCHAR" property="username" />
+    <result column="userPhone" jdbcType="VARCHAR" property="userphone" />
+    <result column="company" jdbcType="VARCHAR" property="company" />
+    <result column="code" jdbcType="VARCHAR" property="code" />
+    <result column="inTime" jdbcType="TIMESTAMP" property="intime" />
+    <result column="outTime" jdbcType="TIMESTAMP" property="outtime" />
+    <result column="status" jdbcType="INTEGER" property="status" />
+    <result column="sysPhone" jdbcType="VARCHAR" property="sysphone" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, number, userName, userPhone, company, code, inTime, outTime, status, sysPhone
+  </sql>
+
+  <select id="findConsole" resultType="map">
+    SELECT COUNT(ID) data1_size,COUNT(TO_DAYS(INTIME)=TO_DAYS(NOW()) OR NULL) data1_day,COUNT(STATUS=0 OR NULL) data2_size,COUNT((TO_DAYS(INTIME)=TO_DAYS(NOW())&amp;&amp;STATUS=0) OR NULL) data2_day FROM EXPRESS
+  </select>
+
+  <select id="findAll" resultMap="BaseResultMap">
+    SELECT * FROM EXPRESS
+  </select>
+
+
+  <select id="findByNumber" resultMap="BaseResultMap">
+    SELECT * FROM EXPRESS WHERE NUMBER=#{number}
+  </select>
+
+  <select id="findAllByPhoneAndCode" resultMap="BaseResultMap">
+    SELECT * FROM EXPRESS WHERE USERPHONE=#{userPhone} AND CODE IS NOT NULL
+  </select>
+
+  <select id="findAllByPhoneNotCode" resultMap="BaseResultMap">
+    SELECT * FROM EXPRESS WHERE USERPHONE=#{userPhone} AND CODE IS NULL
+  </select>
+
+  <update id="updateExpressByCode" parameterType="string">
+    UPDATE EXPRESS SET OUTTIME=NOW(),CODE=NULL,STATUS=1 WHERE CODE=#{code}
+  </update>
+
+
+  <insert id="insert" parameterType="com.kaikeba.bean.Express">
+    INSERT INTO EXPRESS (NUMBER,USERNAME,USERPHONE,COMPANY,CODE,INTIME,STATUS,SYSPHONE) VALUE (#{number},#{username},#{userphone},#{company},#{code},NOW(),0,#{sysphone})
+  </insert>
+
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from express
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from express
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+
+  <select id="findByCode" resultMap="BaseResultMap">
+    SELECT * FROM EXPRESS WHERE CODE=#{code} AND STATUS=0
+  </select>
+
+  <insert id="insertSelective" parameterType="com.kaikeba.bean.Express">
+    insert into express
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="number != null">
+        number,
+      </if>
+      <if test="username != null">
+        userName,
+      </if>
+      <if test="userphone != null">
+        userPhone,
+      </if>
+      <if test="company != null">
+        company,
+      </if>
+      <if test="code != null">
+        code,
+      </if>
+      <if test="intime != null">
+        inTime,
+      </if>
+      <if test="outtime != null">
+        outTime,
+      </if>
+      <if test="status != null">
+        status,
+      </if>
+      <if test="sysphone != null">
+        sysPhone,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="number != null">
+        #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null">
+        #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userphone != null">
+        #{userphone,jdbcType=VARCHAR},
+      </if>
+      <if test="company != null">
+        #{company,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null">
+        #{code,jdbcType=VARCHAR},
+      </if>
+      <if test="intime != null">
+        #{intime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outtime != null">
+        #{outtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null">
+        #{status,jdbcType=INTEGER},
+      </if>
+      <if test="sysphone != null">
+        #{sysphone,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.kaikeba.bean.Express">
+    update express
+    <set>
+      <if test="number != null and number!=''">
+        number = #{number,jdbcType=VARCHAR},
+      </if>
+      <if test="username != null and username!=''">
+        userName = #{username,jdbcType=VARCHAR},
+      </if>
+      <if test="userphone != null and userphone!=''">
+        userPhone = #{userphone,jdbcType=VARCHAR},
+      </if>
+      <if test="company != null and company!=''">
+        company = #{company,jdbcType=VARCHAR},
+      </if>
+      <if test="code != null and code!=''">
+        code = null,
+      </if>
+      <if test="intime != null and intime!=''">
+        inTime = #{intime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="outtime != null and outtime!=''">
+        outTime = #{outtime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="status != null and status!=''">
+        status = #{status,jdbcType=INTEGER},
+      </if>
+      <if test="sysphone != null and sysphone!=''">
+        sysPhone = #{sysphone,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.kaikeba.bean.Express">
+    update express
+    set number = #{number,jdbcType=VARCHAR},
+      userName = #{username,jdbcType=VARCHAR},
+      userPhone = #{userphone,jdbcType=VARCHAR},
+      company = #{company,jdbcType=VARCHAR},
+      code = #{code,jdbcType=VARCHAR},
+      inTime = #{intime,jdbcType=TIMESTAMP},
+      outTime = #{outtime,jdbcType=TIMESTAMP},
+      status = #{status,jdbcType=INTEGER},
+      sysPhone = #{sysphone,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>

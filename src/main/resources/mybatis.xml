@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+    <!--给类或者包起别名-->
+    <typeAliases>
+        <!--给类起别名-->
+        <!--<typeAlias type="com.kaikeba.bean.User" alias="user"></typeAlias>-->
+        <!--给包起别名-->
+        <!--<package name="com.kaikeba.bean"/>-->
+    </typeAliases>
+
+    <!--加载分页查询配置-->
+    <plugins>
+        <plugin interceptor="com.github.pagehelper.PageHelper">
+            <property name="dialect" value="mysql"/>
+        </plugin>
+    </plugins>
+
+</configuration>

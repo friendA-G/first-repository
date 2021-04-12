@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>实名认证 -- 快件e栈服务平台</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no" />
+	<link href="css/normalize.css" type="text/css" rel="stylesheet" />
+	<link href="css/common.css" type="text/css" rel="stylesheet" />
+	<script src="js/jquery.min.js" type="text/javascript"></script>
+	<script src="js/common.js" type="text/javascript"></script>
+	<script src="js/notice.js" type="text/javascript"></script>
+	<script src="js/regexp.js" type="text/javascript"></script>
+	<script src="js/jweixin-1.2.0.js" type="text/javascript"></script>
+	<style type="text/css">
+		.content{
+			overflow: hidden;
+		}
+		.userCheckCont{
+			width: 100%;
+		}
+		.userInfoCont{
+			overflow: hidden;
+			padding: 40px 0px 20px;
+			background-image: linear-gradient(to top,#1bb7c3,#f4f4f4);
+			box-shadow: 0px 3px 3px #c1c1c1;
+		}
+		.userInfoCont  .userInfoIcon{
+			width: 18%;
+			margin: 0px auto 10px;
+		}
+		.userInfoCont  .nickName{
+			font-size: 14px;
+			text-align: center;
+			font-weight: bold;
+			color: #fff;
+		}
+
+		.solidCont{
+			width: 200%;
+			overflow: hidden;
+		}
+		.checkState{
+			width: 50%;
+			margin:30px 0px;
+			float: left;
+		}
+		.checkState .stateIcon{
+			width: 30px;
+			margin: 0 auto;
+		}
+		.checkState .checkStateTxt{
+			text-align: center;
+			font-size: 14px;
+			padding: 5px 0px;
+			color: #333333;
+			font-weight: bold;
+			margin-bottom: 50px;
+		}
+		.checkState .checkBtn{
+			width: 80%;
+			line-height: 40px;
+			margin: 5px auto;
+			font-weight: bold;
+			text-align: center;
+			color: #20d6da;
+			border: 2px solid #20d6da;
+			border-radius: 20px;
+		}
+		.checkBtn:hover{
+			cursor: pointer;
+		}
+		.checkState .checkprompt{
+			font-size: 14px;
+			text-align: center;
+			color: #888888;
+			margin: 8px 0px 0px;
+		}
+
+		.infoCheckEditCont{
+			width: 50%;
+			float: left;
+			padding-top: 20px;
+			overflow:auto;
+		}
+
+		.submitBtn,.backBtn{
+			width: 90%;
+			margin: 0 auto 20px;
+			text-align: center;
+			line-height: 46px;
+			border-radius: 23px;
+			color: #20d6da;
+			border: 2px solid #20d6da;
+			font-weight: bolder;
+		}
+
+		#oldPhone{
+			display: none;
+		}
+
+		/* userIdImg css */
+		.userIdImgUpload{
+			width: 90%;
+			margin: 0 auto 20px;
+			overflow: hidden;
+		}
+		.userIdImgUpload .userIdImgCont{
+			width: 100%;
+			overflow: hidden;
+			border-radius: 8px;
+			border: 1px solid #e1e1e1;
+			background: #fff;
+		}
+		.userIdImgUpload .userIdImgCont img{
+			width: 100%;
+			display: block;
+			margin: 0 auto;
+		}
+		.userIdImgUpload .userIdImgCont .userIdImgUploadDesc{
+			margin: 0px;
+			line-height: 30px;
+			font-size: 14px;
+			color: #999999;
+			font-weight: bold;
+			text-align: center;
+		}
+
+
+		.userUploadDesc{
+			width: 90%;
+			font-size: 14px; 
+			color: #999999;
+			margin: 0 auto 20px;
+		}
+		
+		.imageCover{
+			position: absolute;
+			top: 0px;
+			left: 0px;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.8);
+			display: none;
+		}
+		.number{
+			margin-top: 20px;
+			text-align: center;
+			font-size: 16px;
+		}
+	</style>
+</head>
+<body>
+	<div class="content">
+    
+    <input id="timestamp" type="hidden" value="${timestamp}" />
+	<input id="noncestr" type="hidden" value="${nonceStr}" />
+	<input id="signature" type="hidden" value="${signature}" />
+	<input id="appId" type="hidden" value="${appId}" />
+	
+	<div class="userCheckCont">
+		<div class="userInfoCont">
+			<div class="userInfoIcon">
+				<img src="images/userInfoIcon.png" width="100%">
+			</div>
+			<div class="nickName">用户认证</div>
+		</div>
+	</div>
+	
+	<div class="solidCont">
+		<div class="checkState">
+			<div class="stateIcon">
+				<img src="images/uncheckIcon.png" width="100%">
+			</div>
+			<div class="checkStateTxt" id="checkStateTxt">未认证</div>
+			
+			<!-- 按钮组 -->
+			<div id="text" class="checkBtn userRegBtn">新用户认证</div>
+			<div class="checkBtn" id="revert">点我返回</div>
+			<div class="checkprompt">认证通过开启信息化校园快递</div>
+		</div>
+
+		<div class="infoCheckEditCont" id="newUserReg">
+			<form>
+				<input id="PageContext" type="hidden" value="${pageContext.request.contextPath}" />
+				<input id="wxCode" type="hidden" value="${wxCode}" />
+				<div class="userInputCont">
+					<div class="inputTypeCont">
+						<div class="inputTitle">姓名</div>
+						<input type="text" id="name" class="commonInput" name="name" placeholder="请输入你的姓名...">
+					</div>
+					<div class="inputTypeCont">
+						<div class="inputTitle">手机号</div>
+						<input readonly type="text" id="phone" class="commonInput" name="phone" placeholder="请输入你的手机号码...">
+					</div>
+					<div class="inputTypeCont">
+						<div class="inputTitle">身份证号</div>
+						<input type="text" id="idNumber" class="commonInput" name="idNumber" placeholder="请输入你的身份证...">
+					</div>
+					<div class="inputTypeCont">
+						<div class="inputTitle">密码</div>
+						<input type="text" id="password" class="commonInput" name="password" placeholder="请输入你的密码">
+					</div>
+					<div class="inputTypeCont">
+						<div class="inputTitle">验证码为：</div>
+						<input type="text" id="msg" class="verifiInput" name="msg" placeholder="请输入验证码...">
+						<input type="button" class="verifiBtn" value="发送验证码" id="getCode">
+					</div>
+					<div class="number">验证码为：<span id="number">---</span></div>
+				</div>
+			</form>
+
+			<div id = "userRegSubmitBtn" class="submitBtn userRegSubmitBtn">确认提交</div>
+			<div class="backBtn" id="revert1">点我返回</div>
+		</div>
+	</div>
+	
+	<div class="imageCover">
+		<div class="coverCont">
+			<img src="images/useridimage.jpg" width="100%">
+		</div>
+	</div>
+</div>
+<script src="layer/layer.js"></script>
+<script type="text/javascript">
+	$(function() {
+
+
+		$("#revert").click(function () {
+			location.href="/wxUserhome.html";
+		});
+
+		$("#revert1").click(function () {
+			window.location.href="userCheckStart.html";
+		});
+
+		$.getJSON("/we/getState.do",null,function (result) {
+			if(result.status===0){
+				$("#checkStateTxt").html("已认证");
+				$("#text").html("用户信息修改");
+			}
+		});
+
+		$("#getCode").click(function () {
+			var phone = $("#phone").val();
+			if(phone==null){
+				layer.alert("请填写电话号码",{icon:5});
+				return false;
+			}else if(phone.length!==11){
+				layer.alert("请输入11位数的电话号码",{icon: 5});
+				return false;
+			}else if(phone.match(/^\d{11}$/)==null){
+				layer.alert("请勿输入数字以外的符号作为电话号码",{icon:0});
+				return false;
+			}else if(phone.match(/^[0]/)!=null){
+				layer.alert("请勿输入数字0开头的电话号码",{icon:0});
+				return false;
+			}else {
+				var id = layer.load();
+				$.getJSON("/wx/userGetCode.do",{userPhone:phone},function (result) {
+					layer.close(id);
+					layer.msg(result.result);
+					if(result.status===0){
+						$("#number").html(result.data);
+					}
+				});
+			}
+		});
+
+		$("#userRegSubmitBtn").click(function () {
+			var userPhone = $("#phone").val();
+			var userName = $("#name").val();
+			var idNumber = $("#idNumber").val();
+			var passWord = $("#password").val();
+			var code = $("#msg").val();
+			if((userName==="")||(userPhone==="")||(idNumber==="")||(passWord==="")||(code==="")){
+				layer.alert("请将信息填写完整",{icon:5});
+				return false;
+			}else if(userPhone.length!==11){
+				layer.alert("请输入11位数的电话号码",{icon:5});
+				return false;
+			}else if(userPhone.match(/^\d{11}$/)==null){
+				layer.alert("请勿输入数字以外的字符作为电话号码",{icon:5});
+				return false;
+			}else if(userPhone.match(/^[0]/)!==null){
+				layer.alert("请勿输入以0开头的电话号码",{icon:5});
+				return false;
+			}else if(idNumber.length!==18){
+				layer.alert("请输入18位数的身份证号",{icon:5});
+				return false;
+			}else if(idNumber.match(/^[0]/)!==null){
+				layer.alert("请勿输入以0开头的身份证号",{icon:5});
+				return false;
+			}else if(idNumber.match(/[0-9A-Z]{18}/)==null){
+				layer.alert("请勿输入数字和大写英文字符以外的字符作为身份证号",{icon:5});
+				return false;
+			}else if(userName.length<2||userName.length>16){
+				layer.alert("请输入2-16位的用户名",{icon:5});
+				return false;
+			}else if(userName.match(/\s+/)!==null) {
+				layer.alert("请勿输入空白字符作为姓名", {icon: 5});
+				return false;
+			}else if(passWord.length<5||passWord.length>12){
+				layer.alert("请输入5-12位的密码",{icon:5});
+				return false;
+			}else if(passWord.match(/^\w{5,12}$/)==null){
+				layer.alert("请勿输入数字、英文字母、下滑线以外的字符作为密码", {icon: 5});
+				return false;
+			}else if(code.length!==6){
+				layer.alert("请输入6位数的验证码", {icon: 5});
+				return false;
+			}else if(code.match(/^\d{6}$/)==null){
+				layer.alert("请输入勿输入数字以外的字符作为验证码", {icon: 5});
+				return false;
+			}else if(code.match(/^[0]/)!=null){
+				layer.alert("请勿输入以数字0开头的验证码", {icon: 5});
+				return false;
+			}else {
+				var id = layer.load();
+				var userInfo = {
+					userPhone:userPhone,
+					userName:userName,
+					idNumber:idNumber,
+					passWord:passWord,
+					code:code
+				};
+				$.getJSON("/wx/updateUserInfo.do",userInfo,function (result) {
+					layer.close(id);
+					layer.msg(result.result);
+					if(result.status===0){
+						$("#number").html("---");
+						$("#msg").val("");
+					}
+				});
+			}
+		});
+
+
+
+
+		var pageContextVal = $("#PageContext").val();
+		var wxCodeVal = $("#wxCode").val();
+		var windowW = $(window).width();
+		var windowH = $(window).height();
+		if (windowW > 600) {
+			windowW = 600;
+		}
+		
+		var topH = $(".userCheckCont").height();
+		$(".solidCont").css({"height":(windowH - topH) + "px"});
+		$(".infoCheckEditCont").css({"height":(windowH - topH - 30) + "px"});
+		
+		// cover
+		var contentH = $(".content").height();
+		$(".imageCover").css({"height":contentH + "px"});
+
+		// 样例图片展示  501*377
+		var imageH = windowW * 377 / 501; 
+		$(".coverCont").css({"margin-top":(windowH - imageH)/2 + "px"});
+
+		$(".imageCover").click(function(){
+			$(".imageCover").fadeOut();
+		});
+		
+		$(".solidCont").css({"margin-left":0+"px"});
+
+		$(".userRegBtn").click(function(){
+			$(".solidCont").animate({"margin-left":-windowW+"px"},"fast");
+			var id = layer.load();
+			$.getJSON("/wx/getUserInfo.do",null,function (result) {
+				layer.close(id);
+				if(result.status===0){
+					$("#phone").val(result.data.userphone);
+					$("#name").val(result.data.username);
+					$("#idNumber").val(result.data.idnumber);
+					$("#password").val(result.data.password);
+				}else if(result.status===1){
+					$("#phone").val(result.data.courierphone);
+					$("#name").val(result.data.couriername);
+					$("#idNumber").val(result.data.idnumber);
+					$("#password").val(result.data.password);
+				}else {
+					layer.msg(result.result);
+				}
+			});
+		});
+
+		$(".backBtn").click(function(){
+			$(".solidCont").animate({"margin-left":0+"px"},"fast");
+		});
+	});
+</script>
+</body>
+</html>

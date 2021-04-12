@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="../../css/reset.css"/>
+		<link rel="stylesheet" type="text/css" href="../../css/add.css"/>
+		<style>
+
+		</style>
+	</head>
+	<body>
+		<div id="app">
+			<div class="header">
+				<span>修改快递信息</span>
+			</div>
+			<div class="content">
+				<table>	
+					<tr>
+						<td class="text-right">运单号</td><td class="content_right"><input id="number" class="input inline-input" placeholder="请输入运单号码"> <span class="btn btn-info" id="find">立即查找</span></td>
+					</tr>
+				</table>
+			</div>
+			
+			
+			<div class="header">
+				<span>查找信息如下</span>
+			</div>
+			<div class="content">
+				<table>
+					<tr>
+						<td class="text-right">快递单号</td><td class="content_right"><input class="input" placeholder="请输入单号"></td>
+					</tr>
+					<tr>
+						<td class="text-right">快递公司</td><td class="content_right"><input class="input" ></td>
+					</tr>
+					<tr>
+						<td class="text-right">收货人姓名</td><td class="content_right"><input class="input" placeholder="请输入姓名"></td>
+					</tr>
+					<tr>
+						<td class="text-right">手机号码</td><td class="content_right"><input class="input" placeholder="请输入手机号码"></td>
+					</tr>
+					<tr>
+						<td class="text-right">快递状态</td><td class="content_right"><input type="radio" name="status" class="status" value="1">已签收  <input name="status" type="radio" class="status" value="0">未签收</td>
+					</tr>
+					<tr>
+						<td></td><td class="content_right"><span class="btn btn-info" id="update">立即修改</span> <span class="btn" id="reset">重置</span> </td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</body>
+	<script src="/js/jquery-3.5.0.min.js"></script>
+	<script src="/layer/layer.js"></script>
+	<script>
+		$(function () {
+			var expressID = null;
+			var oldPhone = null;
+			var sysPhone = null;
+			var oldStatus = null;
+			$(".header:eq(1),.content:eq(1)").hide();
+			$("#find").click(function () {
+				var number = $("#number").val();
+				var id = layer.load();
+				$.getJSON("/express/find.do",{number:number},function (result) {
+					layer.close(id);
+					layer.msg(result.result);
+					if(result.status === 0){
+						$(".header:eq(1),.content:eq(1)").fadeIn(1500);
+						$("input:eq(1)").val(result.data.number);
+						$("input:eq(2)").val(result.data.company);
+						$("input:eq(3)").val(result.data.username);
+						$("input:eq(4)").val(result.data.userphone);
+						expressID = result.data.id;
+						oldPhone = result.data.userphone;
+						sysPhone = result.data.sysphone;
+						oldStatus = result.data.status;
+						if(result.data.status === 0){
+							$(".status:eq(1)").prop("checked",true);
+						}else {
+							$(".status:eq(0)").prop("checked",true);
+						}
+					}
+				});
+			});
+
+			$("#update").click(function () {
+				var number = $("input:eq(1)").val();
+				var company = $("input:eq(2)").val();
+				var userName = $("input:eq(3)").val();
+				var newPhone = $("input:eq(4)").val();
+				var status = $(".status:checked").val();
+				var express = null;
+				express={
+					id:expressID,
+					number:number,
+					company:company,
+					userName:userName,
+					status:status,
+					sysPhone:sysPhone,
+					is:false
+				};
+				if(newPhone!==oldPhone){
+					express.userPhone = newPhone;
+				}
+				if(status!=oldStatus){
+					express.is=true;
+				}
+				if((number==="")||(company==="")||(userName==="")||(newPhone==="")){
+					layer.alert("快递信息不完整",{icon:5});
+					return false;
+				}else {
+					if(newPhone.length!==11){
+						layer.alert("请输入11位数的手机号码",{icon:5});
+						return false;
+					}else if(newPhone.match(/^\d{11}$/)==null){
+						layer.alert("请勿输入数字以外的符号",{icon:5});
+						return false;
+					}else if(newPhone.match(/^[0]/)!==null){
+						layer.alert("请勿输入以0数字开头电话号码",{icon:5});
+						return false;
+					}else if(userName.length<2||userName.length>16){
+						layer.alert("请输入2-16位的用户名",{icon:5});
+						return false;
+					}else if(userName.match(/\s+/)!==null) {
+						layer.alert("请勿输入空白字符作为名称", {icon: 5});
+						return false;
+					}else if(number.length<3||number.length>15){
+						layer.alert("请输入3-15数的单号", {icon: 5});
+						return false;
+					}else if(number.match(/^\w{3,10}$/)==null){
+						layer.alert("请勿输入数字、英文字母、下滑线以外的字符", {icon: 5});
+						return false;
+					}else if(oldStatus==1&&status==0) {
+						layer.alert("该快递已签收，不可更改为未签收", {icon: 5});
+						return false;
+					}else {
+						var id = layer.load();
+						$.post("/express/update.do",express,function (result) {
+							layer.close(id);
+							layer.msg(result.result);
+							if(result.status === 0){
+								$(".header:eq(1),.content:eq(1)").hide();
+							}
+						},"JSON");
+					}
+				}
+			});
+
+			$("#reset").click(function () {
+				 $("input:eq(1)").val("");
+				 $("input:eq(2)").val("顺丰速递");
+				 $("input:eq(3)").val("");
+				 $("input:eq(4)").val("");
+			});
+		});
+
+	</script>
+</html>
